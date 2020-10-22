@@ -66,7 +66,20 @@ public class HttpRequestConnectionHandler extends ChannelInboundHandlerAdapter {
         // man-in-the-middle attack.
         // https://stackoverflow.com/questions/43156023/what-is-http-host-header
         // https://sage.amazon.com/questions/866200
-        request.headers().set(HttpHeaderNames.HOST, BackendServerURLUtils.getRemoteHost());
+        request.headers().set("Host", BackendServerURLUtils.getRemoteHost());
+        request.headers().set("Referer", "https://"+BackendServerURLUtils.getRemoteHost()+"/jupyter/default/lab?");
+        request.headers().set("Origin", "https://"+BackendServerURLUtils.getRemoteHost());
+        String cookieString = request.headers().get("Cookie");
+        if (cookieString != null) {
+            String[] cookies = cookieString.split("; ");
+            for (String cookie : cookies) {
+                String[] nameAndValue = cookie.split("=");
+                if ("_xsrf".equalsIgnoreCase("_xsrf")) {
+                    request.headers().set("x-csrf-token", nameAndValue[1]);
+                    request.headers().set("X-XSRFToken", nameAndValue[1]);    
+                }
+            }
+        }
 
         if (isWebSocketUpgradeRequest(headers)) {
             log.info("[STEP WS 1] Detected HTTP upgrade WS request.");
