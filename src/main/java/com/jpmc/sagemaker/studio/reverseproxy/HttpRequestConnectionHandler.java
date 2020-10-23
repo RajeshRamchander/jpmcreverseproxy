@@ -74,7 +74,7 @@ public class HttpRequestConnectionHandler extends ChannelInboundHandlerAdapter {
             String[] cookies = cookieString.split("; ");
             for (String cookie : cookies) {
                 String[] nameAndValue = cookie.split("=");
-                if ("_xsrf".equalsIgnoreCase("_xsrf")) {
+                if ("_xsrf".equalsIgnoreCase(nameAndValue[0])) {
                     request.headers().set("x-csrf-token", nameAndValue[1]);
                     request.headers().set("X-XSRFToken", nameAndValue[1]);    
                 }
